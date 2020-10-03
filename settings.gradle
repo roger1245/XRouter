@@ -1,0 +1,9 @@
+include ':module3'
+include ':base'
+include ':module2'
+include ':module1'
+include ':xrouter-core'
+include ':xrouter-compiler'
+include ':xrouter-annotations'
+include ':app'
+rootProject.name = "XRouter"
