@@ -1,4 +1,4 @@
-package com.example.xrouter
+package com.example.module1
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -14,7 +14,7 @@ class MainActivity : AppCompatActivity() {
             XRouter.sInstance.build(Config.Module1Activity).navigation()
         }
         button2.setOnClickListener {
-            XRouter.sInstance.build(Config.Module1ThirdActivity).navigation()
+            XRouter.sInstance.build(Config.Module2Activity).navigation()
         }
     }
 }

@@ -75,12 +75,9 @@ public class RouterProcessor extends AbstractProcessor {
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-        log.i("go into process");
-
         if (annotations != null && !annotations.isEmpty()) {
             Set<? extends Element> rootElements = roundEnv.getElementsAnnotatedWith(Route.class);
             if (rootElements != null && !rootElements.isEmpty()) {
-                log.i("go into processorRoute");
                 processorRoute(rootElements);
             }
             return true;
