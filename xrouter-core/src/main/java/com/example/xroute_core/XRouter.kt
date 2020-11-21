@@ -7,10 +7,11 @@ import android.content.Intent
 import android.os.Handler
 import android.os.Looper
 import androidx.core.app.ActivityCompat
-import java.lang.RuntimeException
+import com.example.xrouter_annotations.RouteType
 
 class XRouter {
     private var mHandler: Handler? = null
+
     init {
         mHandler = Handler(Looper.getMainLooper())
     }
@@ -33,6 +34,9 @@ class XRouter {
                 if (className.startsWith("$ROUTE_ROOT_PACKAGE.Router_Root_")) {
                     (Class.forName(className).getConstructor()
                         .newInstance() as IRouteRoot).loadInto(WareHouse.groupIndex);
+                } else if (className.startsWith("$ROUTE_ROOT_PACKAGE.Router_Providers_")) {
+                    (Class.forName(className).getConstructor()
+                        .newInstance() as IProviderGroup).loadInto(WareHouse.providersIndex);
                 }
             }
         }
@@ -41,7 +45,6 @@ class XRouter {
             XRouter()
         }
     }
-
 
 
     public fun build(path: String): Postcard {
@@ -65,36 +68,93 @@ class XRouter {
         }
     }
 
-    internal fun navigation(context: Context?, postcard: Postcard, requestCode: Int) {
+    internal fun navigation(context: Context?, postcard: Postcard, requestCode: Int) =
         _navigation(context, postcard, requestCode)
-    }
 
-    private fun _navigation(context: Context?, postcard: Postcard, requestCode: Int) {
-        prepareCard(postcard)
+
+    private fun _navigation(context: Context?, postcard: Postcard, requestCode: Int): Any? {
         val currentContext = context ?: mContext
-        val intent = Intent(currentContext, postcard.destination)
-        if (currentContext !is Activity) {
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        prepareCard(postcard, currentContext)
+
+        when (postcard.type) {
+            RouteType.PROVIDER -> {
+                return postcard.getProvider()
+            }
+            RouteType.ACTIVITY -> {
+                val intent = Intent(currentContext, postcard.destination)
+                if (currentContext !is Activity) {
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                }
+                runInMainThread(Runnable {
+                    ActivityCompat.startActivity(
+                        currentContext,
+                        intent,
+                        null
+                    )
+                })
+
+            }
+            else -> {
+
+            }
         }
-        mHandler?.post {
-            ActivityCompat.startActivity(currentContext, intent, null)
-        }
+
+        return null
     }
 
-    private fun prepareCard(card: Postcard) {
+    //postcard有了path，但是我们需要拿到Class
+    private fun prepareCard(card: Postcard, context: Context) {
         val routeMeta = WareHouse.routes[card.path]
         if (null == routeMeta) {
-            val groupMeta = WareHouse.groupIndex[card.group]
-            if (null == groupMeta) {
-                throw NoRouteFoundException("没有找到对应路由")
-            }
+            val groupMeta = WareHouse.groupIndex[card.group] ?: throw RouteException("没有找到对应路由")
             var iGroupInstance: IRouteGroup = groupMeta.getConstructor().newInstance()
             iGroupInstance.loadInto(WareHouse.routes)
             WareHouse.groupIndex.remove(card.group)
-            prepareCard(card)
+            prepareCard(card, context)
         } else {
             card.destination = routeMeta.destination
+            card.type = routeMeta.type
+
+            when (routeMeta.type) {
+                RouteType.PROVIDER -> {
+                    val providerMeta = routeMeta.destination
+                    var instance = WareHouse.providers[providerMeta]
+                    if (null == instance) {
+                        val provider: IProvider =
+                            providerMeta.getConstructor().newInstance() as IProvider
+                        provider.init(context)
+                        WareHouse.providers[providerMeta] = provider;
+                        instance = provider
+                    }
+                    card.setProvider(instance)
+                }
+                else -> {
+                }
+            }
         }
     }
 
+    private fun runInMainThread(runnable: Runnable) {
+        if (Looper.getMainLooper().thread !== Thread.currentThread()) {
+            mHandler?.post(runnable)
+        } else {
+            runnable.run()
+        }
+    }
+
+    public fun <T> navigation(service: Class<out T>, context: Context? = null): T? {
+        val postcard: Postcard = buildProvider(service.name) ?: return null
+        val currentContext = context ?: mContext
+        prepareCard(postcard, currentContext)
+        return postcard.getProvider() as (T)
+    }
+
+    public fun buildProvider(serviceName: String): Postcard? {
+        val meta = WareHouse.providersIndex[serviceName]
+        return if (null == meta) {
+            null
+        } else {
+            Postcard(meta.path, extractGroup(meta.path))
+        }
+    }
 }

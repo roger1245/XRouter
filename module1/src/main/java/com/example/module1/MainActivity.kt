@@ -16,5 +16,18 @@ class MainActivity : AppCompatActivity() {
         button2.setOnClickListener {
             XRouter.sInstance.build(Config.Module2Activity).navigation()
         }
+        button3.setOnClickListener {
+            val hello: HelloService = XRouter.sInstance.build(Config.HELLO_SERVICE).navigation() as HelloService
+            hello.sayHello(this)
+        }
+        button4.setOnClickListener {
+            val userService: UserServiceImpl = XRouter.sInstance.build(Config.USER_SERVICE_IMPL).navigation() as UserServiceImpl
+            userService.login(this)
+        }
+        button5.setOnClickListener {
+            val userService: IUserService? = XRouter.sInstance.navigation(IUserService::class.java)
+            userService?.login(this)
+        }
+
     }
 }

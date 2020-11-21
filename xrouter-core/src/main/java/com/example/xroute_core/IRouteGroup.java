@@ -9,9 +9,9 @@ public interface IRouteGroup {
 }
 
 //demo如下
-//public class EaseRouter_Group_show implements IRouteGroup {
+//public class Router_Group_module1 implements IRouteGroup {
 //    @Override
 //    public void loadInto(Map<String, RouteMeta> atlas) {
-//        atlas.put("/show/info",RouteMeta.build(RouteMeta.Type.ACTIVITY,ShowActivity.class,"/show/info","show"));
+//        atlas.put("module1/module1activity", RouteMeta.build(RouteType.ACTIVITY, Module1Activity.class, "module1/module1activity"));
 //    }
 //}

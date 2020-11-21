@@ -4,8 +4,9 @@ public class Constant {
     public static final String ARGUMENTS_NAME = "moduleName";
     public static final String ANNOTATION_TYPE_ROUTE = "com.example.xrouter_annotations.Route";
     public static final String ACTIVITY = "android.app.Activity";
+    public static final String IPROVIDER = "com.example.xroute_core.IProvider";
 
-
+    public static final String IPROVIDER_GROUP = "com.example.xroute_core.IProviderGroup";
     public static final String IROUTE_GROUP = "com.example.xroute_core.IRouteGroup";
     public static final String IROUTE_ROOT = "com.example.xroute_core.IRouteRoot";
 

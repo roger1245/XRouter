@@ -12,23 +12,35 @@ public class RouteMeta {
 
     private String group;
 
+    public RouteType getType() {
+        return type;
+    }
+
+    public void setType(RouteType type) {
+        this.type = type;
+    }
+
+    private RouteType type;
+
     public RouteMeta() {
 
     }
 
-    public static RouteMeta build(Class<?> destination, String path) {
-        return new RouteMeta(null , destination, path);
+    public static RouteMeta build(RouteType type, Class<?> destination, String path) {
+        return new RouteMeta(null , destination, path, type);
     }
 
-    public RouteMeta(Route route, Element element) {
-        this(element, null, route.path());
+    public RouteMeta(Route route, Element element, RouteType type) {
+        this(element, null, route.path(), type);
     }
 
-    public RouteMeta(Element element, Class<?> destination, String path) {
+    public RouteMeta(Element element, Class<?> destination, String path, RouteType type) {
         this.destination = destination;
         this.element = element;
         this.path = path;
+        this.type = type;
     }
+
 
     public String getPath() {
         return path;

@@ -2,8 +2,10 @@ package com.example.xrouter_compiler;
 
 import com.example.xrouter_annotations.Route;
 import com.example.xrouter_annotations.RouteMeta;
+import com.example.xrouter_annotations.RouteType;
 import com.example.xrouter_compiler.utils.Constant;
 import com.example.xrouter_compiler.utils.Log;
+import com.example.xrouter_compiler.utils.StringUtils;
 import com.google.auto.service.AutoService;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.JavaFile;
@@ -37,6 +39,12 @@ import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 
+import static com.example.xrouter_compiler.utils.Constant.ACTIVITY;
+import static com.example.xrouter_compiler.utils.Constant.IPROVIDER;
+import static com.example.xrouter_compiler.utils.Constant.IPROVIDER_GROUP;
+import static com.example.xrouter_compiler.utils.Constant.ROUTE_ROOT_PACKAGE;
+import static javax.lang.model.element.Modifier.PUBLIC;
+
 
 @AutoService(Processor.class)
 @SupportedOptions(Constant.ARGUMENTS_NAME)
@@ -50,6 +58,8 @@ public class RouterProcessor extends AbstractProcessor {
     private Types typeUtils;
     private Filer filerUtils;
     private String moduleName;
+    private TypeMirror iProvider;
+    private TypeMirror iProviderGroup;
 
     private Map<String, List<RouteMeta>> groupMap = new HashMap<>();
 
@@ -70,6 +80,9 @@ public class RouterProcessor extends AbstractProcessor {
         if (moduleName == null || moduleName.isEmpty()) {
             throw new RuntimeException("Not set processor moduleName option");
         }
+
+        iProvider = elementUtils.getTypeElement(IPROVIDER).asType();
+
         log.i("init RouterProcessor " + moduleName + " success !");
     }
 
@@ -86,14 +99,18 @@ public class RouterProcessor extends AbstractProcessor {
     }
 
     private void processorRoute(Set<? extends Element> rootElements) {
-        TypeElement activity = elementUtils.getTypeElement(Constant.ACTIVITY);
+        TypeElement activity = elementUtils.getTypeElement(ACTIVITY);
+        iProviderGroup = elementUtils.getTypeElement(IPROVIDER_GROUP).asType();
+
         for (Element element : rootElements) {
             RouteMeta routeMeta;
             TypeMirror typeMirror = element.asType();
             log.i("Route class:" + typeMirror.toString());
             Route route = element.getAnnotation(Route.class);
             if (typeUtils.isSubtype(typeMirror, activity.asType())) {
-                routeMeta = new RouteMeta(route, element);
+                routeMeta = new RouteMeta(route, element, RouteType.ACTIVITY);
+            } else if (typeUtils.isSubtype(typeMirror, iProvider)) {
+                routeMeta = new RouteMeta(route, element, RouteType.PROVIDER);
             } else {
                 throw new RuntimeException("Just support Activity now");
             }
@@ -105,6 +122,8 @@ public class RouterProcessor extends AbstractProcessor {
         generatedGroup(iRouteGroup);
 
         generatedRoot(iRouteRoot, iRouteGroup);
+
+        generatedProvider();
 
     }
 
@@ -127,23 +146,26 @@ public class RouterProcessor extends AbstractProcessor {
     private boolean routeVerify(RouteMeta routeMeta) {
         String path = routeMeta.getPath();
         String group = routeMeta.getGroup();
-        if (!path.startsWith("/")) {
+
+        if (StringUtils.isEmpty(path)) {
             return false;
         }
+
         if (group == null || group.isEmpty()) {
-            String defaultGroup = path.substring(1, path.indexOf("/", 1));
+            //it can be @path("/group/xxx") or @path("group/xxx")
+            int startIndex = path.startsWith("/") ? 1 : 0;
+            int endIndex = path.indexOf("/", startIndex);
+            String defaultGroup = path.substring(startIndex, endIndex);
             routeMeta.setGroup(defaultGroup);
         }
         return true;
     }
 
 
-//
-//    public class EaseRouter_Group_main implements IRouteGroup {
+//    public class Router_Group_userservice implements IRouteGroup {
 //        @Override
 //        public void loadInto(Map<String, RouteMeta> atlas) {
-//            atlas.put("/main/main",RouteMeta.build(RouteMeta.Type.ACTIVITY,Main2\Activity.class,"/main/main","main"));
-//            atlas.put("/main/main2",RouteMeta.build(RouteMeta.Type.ACTIVITY,Main2\Activity.class,"/main/main2","main"));
+//            atlas.put("/userservice/userservice", RouteMeta.build(RouteType.PROVIDER, UserServiceImpl.class, "/userservice/userservice"));
 //        }
 //    }
     private void generatedGroup(TypeElement iRouteGroup) {
@@ -162,9 +184,10 @@ public class RouterProcessor extends AbstractProcessor {
             String groupName = entry.getKey();
             List<RouteMeta> groupData = entry.getValue();
             for (RouteMeta routeMeta : groupData) {
-                methodBuilder.addStatement("atlas.put($S, $T.build($T.class, $S))",
+                methodBuilder.addStatement("atlas.put($S, $T.build($T." + routeMeta.getType() + ", $T.class, $S))",
                         routeMeta.getPath(),
                         ClassName.get(RouteMeta.class),
+                        ClassName.get(RouteType.class),
                         ClassName.get((TypeElement) routeMeta.getElement()),
                         routeMeta.getPath()
                 );
@@ -185,12 +208,12 @@ public class RouterProcessor extends AbstractProcessor {
         }
     }
 
-//
-//    public class EaseRouter_Root_app implements IRouteRoot {
+//    public class Router_Root_module1 implements IRouteRoot {
 //        @Override
 //        public void loadInto(Map<String, Class<? extends IRouteGroup>> routes) {
-//            routes.put("main", EaseRouter_Group_main.class);
-//            routes.put("show", EaseRouter_Group_show.class);
+//            routes.put("hello", Router_Group_hello.class);
+//            routes.put("module1", Router_Group_module1.class);
+//            routes.put("userservice", Router_Group_userservice.class);
 //        }
 //    }
     private void generatedRoot(TypeElement iRouteRoot, TypeElement iRouteGroup) {
@@ -225,6 +248,75 @@ public class RouterProcessor extends AbstractProcessor {
             e.printStackTrace();
         }
 
+    }
+
+//    public class Router_Providers_module1 implements IProviderGroup {
+//        @Override
+//        public void loadInto(Map<String, RouteMeta> providers) {
+//            providers.put("com.example.module1.IUserService", RouteMeta.build(RouteType.PROVIDER, UserServiceImpl.class, "/userservice/userservice"));
+//            providers.put("com.example.module1.HelloService", RouteMeta.build(RouteType.PROVIDER, HelloService.class, "/hello/helloservice"));
+//        }
+//    }
+    private void generatedProvider() {
+        ParameterizedTypeName parameterizedTypeName = ParameterizedTypeName.get(
+                ClassName.get(Map.class),
+                ClassName.get(String.class),
+                ClassName.get(RouteMeta.class)
+        );
+        ParameterSpec providers = ParameterSpec.builder(parameterizedTypeName, "providers").build();
+
+        MethodSpec.Builder loadIntoMethodOfProviderBuilder = MethodSpec.methodBuilder("loadInto")
+                .addAnnotation(Override.class)
+                .addModifiers(PUBLIC)
+                .addParameter(providers);
+
+        for (Map.Entry<String, List<RouteMeta>> entry : groupMap.entrySet()) {
+            List<RouteMeta> groupData = entry.getValue();
+            for (RouteMeta routeMeta : groupData) {
+                switch (routeMeta.getType()) {
+                    case PROVIDER:
+                        List<? extends TypeMirror> interfaces = ((TypeElement) routeMeta.getElement()).getInterfaces();
+                        for (TypeMirror tm : interfaces) {
+                            if (typeUtils.isSameType(tm, iProvider)) {
+                                loadIntoMethodOfProviderBuilder.addStatement(
+                                        "providers.put($S, $T.build($T." + routeMeta.getType() + ", $T.class, $S))",
+                                        (routeMeta.getElement()).toString(),
+                                        ClassName.get(RouteMeta.class),
+                                        ClassName.get(RouteType.class),
+                                        ClassName.get((TypeElement) routeMeta.getElement()),
+                                        routeMeta.getPath()
+                                );
+                            } else if (typeUtils.isSubtype(tm, iProvider)) {
+                                loadIntoMethodOfProviderBuilder.addStatement(
+                                        "providers.put($S, $T.build($T." + routeMeta.getType() + ", $T.class, $S))",
+                                        tm.toString(),
+                                        ClassName.get(RouteMeta.class),
+                                        ClassName.get(RouteType.class),
+                                        ClassName.get((TypeElement) routeMeta.getElement()),
+                                        routeMeta.getPath()
+                                );
+                            }
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+        }
+        String providerMapFileName = "Router_Providers_" + moduleName;
+        JavaFile javaFile = JavaFile.builder(ROUTE_ROOT_PACKAGE,
+                TypeSpec.classBuilder(providerMapFileName)
+                        .addSuperinterface(ClassName.get(iProviderGroup))
+                        .addModifiers(PUBLIC)
+                        .addMethod(loadIntoMethodOfProviderBuilder.build())
+                        .build()
+        ).build();
+        try {
+            javaFile.writeTo(filerUtils);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 }

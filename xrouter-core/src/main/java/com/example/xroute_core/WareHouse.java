@@ -9,4 +9,9 @@ public class WareHouse {
     static Map<String, Class<? extends IRouteGroup>> groupIndex = new HashMap<>();
 
     static Map<String, RouteMeta> routes = new HashMap<>();
+
+    // Cache provider
+    static Map<Class, IProvider> providers = new HashMap<>();
+
+    static Map<String, RouteMeta> providersIndex = new HashMap<>();
 }
