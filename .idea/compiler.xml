@@ -9,12 +9,18 @@
           <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.google.auto/auto-common/0.3/4073ab16ab4aceb9a217273da6442166bf51ae16/auto-common-0.3.jar" />
           <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.google.guava/guava/18.0/cce0823396aa693798f8882e64213b1772032b09/guava-18.0.jar" />
         </processorPath>
-        <module name="xrouter-compiler" />
+        <module name="XRouter.xrouter-compiler" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
+    <bytecodeTargetLevel target="1.7">
       <module name="xrouter-annotations" target="1.7" />
       <module name="xrouter-compiler" target="1.7" />
+      <module name="XRouter.app" target="1.8" />
+      <module name="XRouter.base" target="1.8" />
+      <module name="XRouter.module1" target="1.8" />
+      <module name="XRouter.module2" target="1.8" />
+      <module name="XRouter.module3" target="1.8" />
+      <module name="XRouter.xrouter-core" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>

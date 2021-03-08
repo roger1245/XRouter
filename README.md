@@ -111,5 +111,5 @@
 
 ### apk下载：
 
-URL
+[URL](https://github.com/roger1245/XRouter/blob/master/apk/app-debug.apk)
 
