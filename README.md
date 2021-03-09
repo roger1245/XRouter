@@ -18,7 +18,28 @@
 
 ### 功能：
 
-1. 添加依赖和配置：
+1. 添加jitpack仓库
+
+    ```groovy
+        allprojects {
+            repositories {
+                ...
+                maven { url 'https://jitpack.io' }
+            }
+        }
+    ```
+
+2. 添加依赖：
+
+    ```groovy
+        dependencies {
+            //kotlin 使用kapt编译时依赖注解，Java使用annotationProcessor
+            kapt 'com.github.roger1245.XRouter:xrouter-compiler:1.0.2'
+            api 'com.github.roger1245.XRouter:xrouter-core:1.0.2'
+        }
+    ```
+
+3. 添加配置：
 
    ```groovy
    android {
@@ -33,7 +54,7 @@
    
    ```
 
-2. 初始化SDK：
+4. 初始化SDK：
 
    ```kotlin
    public class XRouterApplication extends Application {
@@ -45,7 +66,7 @@
    }
    ```
 
-3. 添加注解：
+5. 添加注解：
 
    ```kotlin
    @Route(path = Config.Module1Activity)
@@ -54,14 +75,14 @@
    }
    ```
 
-4. 发起路由操作：
+6. 发起路由操作：
 
    ```kotlin
    //1.路由内通过path跳转另一个Activity
    XRouter.sInstance.build(Config.Module1Activity).navigation()
    ```
 
-5. 通过aop方式获取服务
+7. 通过aop方式获取服务
 
    ```kotlin
    val hello: HelloService = XRouter.sInstance.build(Config.HELLO_SERVICE).navigation() as HelloService
@@ -80,7 +101,7 @@
    }
    ```
 
-6. 通过接口的方式发现服务:
+8. 通过接口的方式发现服务:
 
    ```kotlin
    val userService: IUserService? = XRouter.sInstance.navigation(IUserService::class.java)
@@ -108,8 +129,3 @@
    ```
 
    
-
-### apk下载：
-
-[URL](https://github.com/roger1245/XRouter/blob/master/apk/app-debug.apk)
-
