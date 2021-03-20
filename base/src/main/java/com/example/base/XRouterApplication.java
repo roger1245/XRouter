@@ -2,7 +2,7 @@ package com.example.base;
 
 import android.app.Application;
 
-import com.example.xroute_core.XRouter;
+import com.example.xrouter_core.XRouter;
 
 public class XRouterApplication extends Application {
     @Override

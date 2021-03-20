@@ -1,4 +1,4 @@
-package com.example.xroute_core
+package com.example.xrouter_core
 
 import android.app.Activity
 import android.app.Application
@@ -7,6 +7,11 @@ import android.content.Intent
 import android.os.Handler
 import android.os.Looper
 import androidx.core.app.ActivityCompat
+import com.example.xrouter_core.template.IProvider
+import com.example.xrouter_core.template.IProviderGroup
+import com.example.xrouter_core.template.IRouteGroup
+import com.example.xrouter_core.template.IRouteRoot
+import com.example.xrouter_core.utils.Logger
 import com.example.xrouter_annotations.RouteType
 
 class XRouter {
@@ -17,12 +22,19 @@ class XRouter {
     }
 
     companion object {
+        private val logger = Logger.logger
         private const val ROUTE_ROOT_PACKAGE = "com.example.xrouter.routes"
         public lateinit var mContext: Application
         public fun init(application: Application) {
             mContext = application
             try {
-                loadInto()
+                LogisticsCenter.loadRouterMap()
+                if (LogisticsCenter.registerByPlugin) {
+                    logger.i("Load router map by router-auto-register plugin.")
+
+                } else {
+                    loadInto()
+                }
             } catch (e: Exception) {
                 e.printStackTrace()
             }

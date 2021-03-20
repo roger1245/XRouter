@@ -1,4 +1,4 @@
-package com.example.xroute_core;
+package com.example.xrouter_core;
 
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ThreadFactory;

@@ -3,7 +3,7 @@ package com.example.module1
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.example.base.Config
-import com.example.xroute_core.XRouter
+import com.example.xrouter_core.XRouter
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {

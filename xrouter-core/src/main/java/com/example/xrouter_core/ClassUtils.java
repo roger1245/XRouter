@@ -1,4 +1,4 @@
-package com.example.xroute_core;
+package com.example.xrouter_core;
 
 import android.app.Application;
 import android.content.Context;

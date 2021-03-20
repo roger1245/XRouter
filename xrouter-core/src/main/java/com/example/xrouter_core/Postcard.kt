@@ -1,9 +1,9 @@
-package com.example.xroute_core
+package com.example.xrouter_core
 
-import android.app.Activity
 import android.content.Context
 import android.os.Bundle
-import com.example.xroute_core.XRouter.Companion.sInstance
+import com.example.xrouter_core.XRouter.Companion.sInstance
+import com.example.xrouter_core.template.IProvider
 import com.example.xrouter_annotations.RouteMeta
 
 class Postcard @JvmOverloads constructor(

@@ -1,0 +1,23 @@
+apply plugin: 'groovy'
+
+dependencies {
+    implementation gradleApi()
+    implementation localGroovy()
+    implementation 'com.android.tools.build:gradle:4.0.1'
+}
+
+
+//apply plugin: 'maven'
+//def group = 'com.example.xrouter'
+//def version = '1.0.0'
+//def artifactId='xrouter-gradle-plugin'
+//uploadArchives {
+//    repositories {
+//        mavenDeployer {
+//            pom.groupId = group
+//            pom.artifactId = artifactId
+//            pom.version = version
+//            repository(url: uri('../repo'))
+//        }
+//    }
+//}

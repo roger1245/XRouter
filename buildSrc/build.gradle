@@ -1,0 +1,21 @@
+apply plugin: 'groovy'
+
+repositories {
+    jcenter()
+    google()
+    mavenCentral()
+}
+
+dependencies {
+    implementation gradleApi()
+    implementation localGroovy()
+
+    implementation 'com.android.tools.build:gradle:4.0.1'
+}
+
+sourceSets {
+    main {
+        groovy.srcDirs = ['../xrouter-gradle-plugin/src/main/groovy']
+        resources.srcDirs = ['../xrouter-gradle-plugin/src/main/resources']
+    }
+}

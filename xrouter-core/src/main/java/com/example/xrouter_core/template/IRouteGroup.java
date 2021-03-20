@@ -1,4 +1,4 @@
-package com.example.xroute_core;
+package com.example.xrouter_core.template;
 
 import com.example.xrouter_annotations.RouteMeta;
 

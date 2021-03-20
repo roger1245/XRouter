@@ -4,7 +4,7 @@ import android.content.Context;
 import android.widget.Toast;
 
 import com.example.base.Config;
-import com.example.xroute_core.IProvider;
+import com.example.xrouter_core.template.IProvider;
 import com.example.xrouter_annotations.Route;
 
 @Route(path = Config.HELLO_SERVICE)

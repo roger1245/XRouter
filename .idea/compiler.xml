@@ -17,10 +17,12 @@
       <module name="xrouter-compiler" target="1.7" />
       <module name="XRouter.app" target="1.8" />
       <module name="XRouter.base" target="1.8" />
+      <module name="XRouter.buildSrc" target="1.8" />
       <module name="XRouter.module1" target="1.8" />
       <module name="XRouter.module2" target="1.8" />
       <module name="XRouter.module3" target="1.8" />
       <module name="XRouter.xrouter-core" target="1.8" />
+      <module name="XRouter.xrouter-gradle-plugin" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>
