@@ -8,6 +8,7 @@
 2. 能够掌握基本的apt和javapoet框架的使用
 3. 可以动手实现自己的依赖注入框架
 4. 对框架设计，解耦有新的理解
+5. 了解gradle插件编写，了解ASM框架
 
 ### 项目已实现：
 
@@ -15,6 +16,7 @@
 2. 支持多模块工程使用
 3. 支持通过path获取的aop服务
 4. 支持通过接口发现服务
+5. 通过插件利用ASM加快第一次进入应用的速度
 
 ### 功能：
 
@@ -128,4 +130,24 @@
    }
    ```
 
-   
+9. 为了加快第一次进入应用的速度，可以通过gradle插件的方式利用ASM插入字节码，替代原来的运行时反射查找类文件的方式，如何引入：
+
+    根build.gradle引入：
+
+    ```groovy
+    buildscript {
+    	...
+        dependencies {
+            ....
+            classpath "com.github.roger1245.XRouter:xrouter-gradle-plugin:latestversion"
+        }
+    }
+    ```
+
+    项目build.gradle引入：
+
+    ```groovy
+    apply plugin: 'xrouter'
+    ```
+
+    即可。
